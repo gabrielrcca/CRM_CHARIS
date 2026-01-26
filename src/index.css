@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --color-charis-dark: #0A0A0A;
+  --color-charis-darker: #050505;
+  --color-charis-card: #111111;
+  --color-charis-gold: #C9A87C;
+  --color-charis-goldLight: #E3C8A0;
+  --color-charis-gray: #2A2A2A;
+
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+}
+
+@layer base {
+  body {
+    /* Usando as variáveis CSS diretamente ou as classes utilitárias geradas */
+    background-color: var(--color-charis-darker);
+    color: white;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: oklch(0.75 0.15 75 / 0.3);
+    /* Aproximação do Gold */
+    color: white;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
