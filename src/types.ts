@@ -1,20 +1,16 @@
-export type LeadStatus = 'new' | 'contacted' | 'scheduled' | 'showed_up' | 'closed' | 'lost';
+// Este arquivo mantém compatibilidade com imports antigos
+// Os tipos reais estão em ./types/database.ts
 
-export interface Lead {
-    id: string;
-    name: string;
-    phone: string;
-    email?: string;
-    source: 'Meta' | 'Google' | 'Manual' | 'Indication';
-    status: LeadStatus;
-    value?: number;
-    createdAt: string;
-    avatar?: string;
-    tags?: string[];
-}
+export type {
+    LeadStatus,
+    CrmLead,
+    CrmStage,
+    CrmPipeline,
+    CrmActivity,
+    KanbanColumn,
+    Profile,
+    Database
+} from './types/database';
 
-export interface KanbanColumn {
-    id: LeadStatus;
-    title: string;
-    color: string; // Hex for the accent border
-}
+// Alias para compatibilidade com código antigo
+export type Lead = import('./types/database').CrmLead;
