@@ -4,8 +4,8 @@ import { Loader2, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
 
 export const LoginScreen = () => {
     const { signIn, isLoading, error, clearError } = useAuthStore();
-    const [email, setEmail] = useState('gabrielcavalcante.pr@gmail.com');
-    const [password, setPassword] = useState('123456789');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

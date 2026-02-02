@@ -2,11 +2,8 @@ import { useState } from 'react';
 import {
     LayoutDashboard,
     KanbanSquare,
-    Users,
     Settings,
-    MessageSquare,
     Menu,
-    PieChart,
     LogOut,
     Sun,
     Moon
@@ -25,9 +22,6 @@ export const Sidebar = () => {
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
         { icon: KanbanSquare, label: 'Pipeline (Leads)', path: '/leads' },
-        { icon: Users, label: 'Contatos', path: '/contacts' },
-        { icon: MessageSquare, label: 'Atendimentos', path: '/chats' },
-        { icon: PieChart, label: 'Relatórios', path: '/reports' },
         { icon: Settings, label: 'Configurações', path: '/settings' },
     ];
 

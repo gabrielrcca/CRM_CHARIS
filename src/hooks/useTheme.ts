@@ -11,6 +11,7 @@ export const useTheme = () => {
     useEffect(() => {
         const root = window.document.documentElement;
 
+        console.log('Applying theme:', theme);
         if (theme === 'dark') {
             root.classList.add('dark');
         } else {
@@ -21,7 +22,11 @@ export const useTheme = () => {
     }, [theme]);
 
     const toggleTheme = () => {
-        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+        setTheme(prev => {
+            const next = prev === 'dark' ? 'light' : 'dark';
+            console.log('Toggling theme to:', next);
+            return next;
+        });
     };
 
     return { theme, toggleTheme };

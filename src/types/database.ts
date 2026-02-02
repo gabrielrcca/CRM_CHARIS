@@ -36,6 +36,7 @@ export interface CrmStage {
 export interface CrmLead {
     id: string;
     client_id: string;
+    pipeline_id: string | null;
     stage_id: string | null;
     name: string;
     email: string | null;
@@ -55,8 +56,26 @@ export interface CrmLead {
     utm_term: string | null;
     click_id: string | null;
     conversion_path: object | null;
+    // New fields
+    birth_date: string | null;
+    custom_fields: Record<string, any> | null;
+    lead_score: number;
+    loss_reason: string | null;
+
     created_at: string;
     updated_at: string;
+}
+
+export interface CrmFieldDefinition {
+    id: string;
+    client_id: string;
+    key: string;
+    label: string;
+    type: 'text' | 'number' | 'date' | 'select' | 'boolean';
+    options: string[] | null; // JSONB array stored as string[]
+    required: boolean;
+    order: number;
+    created_at: string;
 }
 
 export interface CrmActivity {
@@ -104,6 +123,11 @@ export interface Database {
                 Row: CrmActivity;
                 Insert: Omit<CrmActivity, 'id'>;
                 Update: Partial<CrmActivity>;
+            };
+            crm_field_definitions: {
+                Row: CrmFieldDefinition;
+                Insert: Omit<CrmFieldDefinition, 'id' | 'created_at'>;
+                Update: Partial<Omit<CrmFieldDefinition, 'id' | 'created_at'>>;
             };
         };
     };

@@ -6,14 +6,15 @@ import { MoreHorizontal, Plus } from 'lucide-react';
 interface ColumnProps {
     column: KanbanColumn;
     leads: CrmLead[];
+    onCardClick: (id: string) => void;
 }
 
-export const Column = ({ column, leads }: ColumnProps) => {
+export const Column = ({ column, leads, onCardClick }: ColumnProps) => {
     // Calcular valor total da coluna
     const totalValue = leads.reduce((sum, lead) => sum + (lead.value || 0), 0);
 
     return (
-        <div className="flex flex-col h-full min-w-[320px] w-[320px]">
+        <div className="flex flex-col h-full min-w-[280px] w-[280px]">
             {/* Column Header */}
             <div className="flex items-center justify-between mb-4 px-1">
                 <div className="flex items-center gap-2">
@@ -54,8 +55,8 @@ export const Column = ({ column, leads }: ColumnProps) => {
                         ref={provided.innerRef}
                         {...provided.droppableProps}
                         className={`
-                flex-1 overflow-y-auto px-1 scrollbar-none pb-20
-                ${snapshot.isDraggingOver ? 'bg-gray-100 dark:bg-white/[0.02] rounded-xl' : ''}
+                flex-1 overflow-y-auto overflow-x-hidden px-2 pb-24 custom-scrollbar
+                ${snapshot.isDraggingOver ? 'bg-charis-navy/20 rounded-xl' : ''}
                 transition-colors
             `}
                     >
@@ -65,7 +66,7 @@ export const Column = ({ column, leads }: ColumnProps) => {
                             </div>
                         )}
                         {leads.map((lead, index) => (
-                            <Card key={lead.id} lead={lead} index={index} />
+                            <Card key={lead.id} lead={lead} index={index} onClick={() => onCardClick(lead.id)} />
                         ))}
                         {provided.placeholder}
                     </div>

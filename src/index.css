@@ -1,24 +1,40 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-charis-dark: #0A0A0A;
-  --color-charis-darker: #050505;
-  --color-charis-card: #111111;
+  --color-charis-navy: #0A2342;
   --color-charis-gold: #C9A87C;
+  --color-charis-red: #C64128;
+  --color-charis-white: #FFFFFF;
+
+  /* Transitional aliases */
+  --color-charis-dark: var(--color-charis-navy);
+  --color-charis-darker: #06162a;
+  /* Slightly darker navy */
+  --color-charis-card: rgba(255, 255, 255, 0.05);
   --color-charis-goldLight: #E3C8A0;
-  --color-charis-gray: #2A2A2A;
+  --color-charis-gray: #1e293b;
 
   --font-sans: 'Inter', sans-serif;
   --font-serif: 'Playfair Display', serif;
 }
 
 @layer base {
-  body {
-    /* Usando as variáveis CSS diretamente ou as classes utilitárias geradas */
-    background-color: var(--color-charis-darker);
+  :root {
+    background-color: #f9fafb;
+    color: var(--color-charis-navy);
+  }
+
+  :root.dark {
+    background-color: var(--color-charis-navy);
     color: white;
+  }
+
+  body {
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    background-color: inherit;
+    color: inherit;
   }
 
   ::selection {
@@ -30,19 +46,34 @@
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:root.dark ::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 9999px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+:root.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(201, 168, 124, 0.3);
+  /* Charis Gold with Opacity */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(201, 168, 124, 0.6);
+}
+
+:root.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-charis-gold);
 }

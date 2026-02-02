@@ -2,13 +2,17 @@ import { DragDropContext } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { Column } from './Column';
 import { useLeadsStore } from '../../store/useLeadsStore';
-import type { KanbanColumn, LeadStatus } from '../../types';
+import type { KanbanColumn } from '../../types';
 import { Loader2 } from 'lucide-react';
 
 // Mapeamento removido: STAGE_TO_STATUS
 // Stages agora são totalmente dinâmicos e baseados no ID do banco.
 
-export const Board = () => {
+interface BoardProps {
+    onCardClick: (id: string) => void;
+}
+
+export const Board = ({ onCardClick }: BoardProps) => {
     const { leads, stages, moveLead, isLoading } = useLeadsStore();
 
     // Converter stages do banco para colunas do Kanban
@@ -56,12 +60,12 @@ export const Board = () => {
     }
 
     return (
-        <div className="h-full overflow-x-auto">
+        <div className="h-full">
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="flex gap-6 h-full min-w-max pb-4">
+                <div className="flex gap-4 h-full min-w-max pb-4">
                     {displayColumns.map((column) => {
                         const columnLeads = leads.filter((lead) => lead.stage_id === column.id);
-                        return <Column key={column.id} column={column} leads={columnLeads} />;
+                        return <Column key={column.id} column={column} leads={columnLeads} onCardClick={onCardClick} />;
                     })}
                 </div>
             </DragDropContext>

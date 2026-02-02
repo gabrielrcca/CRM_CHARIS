@@ -36,13 +36,25 @@ export const useAuthStore = create<AuthState>((set) => ({
                     .eq('id', session.user.id)
                     .single();
 
-                const allowedRoles = ['manager', 'commercial', 'consultant', 'crm_agent'];
+                if (!profile) {
+                    await supabase.auth.signOut();
+                    set({
+                        session: null,
+                        user: null,
+                        profile: null,
+                        isLoading: false,
+                        error: 'Perfil não encontrado no banco de dados.'
+                    });
+                    return;
+                }
 
-                // Check access permissions
-                const hasAccess = profile.role === 'admin' ||
-                    (allowedRoles.includes(profile.role) && profile.has_crm_access === true);
+                const allowedRoles = ['manager', 'commercial', 'consultant', 'crm_agent', 'sales_consultant', 'telemarketing'];
 
-                if (!profile || !hasAccess) {
+                // Check access permissions - Admin always has access. Others need has_crm_access OR be manager/commercial (legacy check fix)
+                const hasAccess = profile.role === 'admin' || profile.role === 'manager' ||
+                    (allowedRoles.includes(profile.role) && (profile.has_crm_access === true || profile.has_crm_access === null)); // Fallback for null temporarily
+
+                if (!hasAccess) {
                     await supabase.auth.signOut();
                     set({
                         session: null,
@@ -78,10 +90,10 @@ export const useAuthStore = create<AuthState>((set) => ({
                         .eq('id', session.user.id)
                         .single();
 
-                    const allowedRoles = ['manager', 'commercial', 'consultant', 'crm_agent'];
+                    const allowedRoles = ['manager', 'commercial', 'consultant', 'crm_agent', 'sales_consultant', 'telemarketing'];
 
-                    const hasAccess = profile.role === 'admin' ||
-                        (allowedRoles.includes(profile.role) && profile.has_crm_access === true);
+                    const hasAccess = profile.role === 'admin' || profile.role === 'manager' ||
+                        (allowedRoles.includes(profile.role) && (profile.has_crm_access === true || profile.has_crm_access === null));
 
                     if (!profile || !hasAccess) {
                         await supabase.auth.signOut();
@@ -123,10 +135,10 @@ export const useAuthStore = create<AuthState>((set) => ({
                 .eq('id', data.user.id)
                 .single();
 
-            const allowedRoles = ['manager', 'commercial', 'consultant', 'crm_agent'];
+            const allowedRoles = ['manager', 'commercial', 'consultant', 'crm_agent', 'sales_consultant', 'telemarketing'];
 
-            const hasAccess = profile.role === 'admin' ||
-                (allowedRoles.includes(profile.role) && profile.has_crm_access === true);
+            const hasAccess = profile.role === 'admin' || profile.role === 'manager' ||
+                (allowedRoles.includes(profile.role) && (profile.has_crm_access === true || profile.has_crm_access === null));
 
             if (!profile || !hasAccess) {
                 await supabase.auth.signOut();

@@ -131,17 +131,22 @@ export const PipelineConfigModal = ({ isOpen, onClose }: PipelineConfigModalProp
                                     value={stage.name}
                                     onChange={(e) => handleNameChange(stage.id, e.target.value)}
                                     onBlur={(e) => handleNameBlur(stage.id, e.target.value)}
-                                    className="flex-1 bg-transparent border border-transparent hover:border-gray-200 dark:hover:border-white/10 focus:border-charis-gold rounded px-2 py-1 text-gray-900 dark:text-white outline-none transition-colors"
+                                    disabled={['Lead novos', 'Em tratativa', 'Fechado', 'Perdidos'].includes(stage.name)}
+                                    className="flex-1 bg-transparent border border-transparent hover:border-gray-200 dark:hover:border-white/10 focus:border-charis-gold rounded px-2 py-1 text-gray-900 dark:text-white outline-none transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                                 />
 
-                                {/* Delete */}
-                                <button
-                                    onClick={() => handleDeleteStage(stage.id)}
-                                    className="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    title="Excluir Estágio"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
+                                {/* Delete - Only for non-default stages */}
+                                {!['Lead novos', 'Em tratativa', 'Fechado', 'Perdidos'].includes(stage.name) ? (
+                                    <button
+                                        onClick={() => handleDeleteStage(stage.id)}
+                                        className="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        title="Excluir Estágio"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                ) : (
+                                    <div className="w-9" /> /* Spacer if not deletable */
+                                )}
                             </div>
                         ))}
                     </div>

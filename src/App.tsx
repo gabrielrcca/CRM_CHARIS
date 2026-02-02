@@ -4,6 +4,7 @@ import { AppLayout } from './components/Layout/AppLayout';
 import { LoginScreen } from './components/Auth/LoginScreen';
 import { DashboardPage } from './pages/DashboardPage';
 import { LeadsPage } from './pages/LeadsPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { useAuthStore } from './store/useAuthStore';
 import { useLeadsStore } from './store/useLeadsStore';
 import { Loader2 } from 'lucide-react';
@@ -56,6 +57,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<AppLayout><DashboardPage /></AppLayout>} />
                 <Route path="/leads" element={<AppLayout><LeadsPage /></AppLayout>} />
+                <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </BrowserRouter>

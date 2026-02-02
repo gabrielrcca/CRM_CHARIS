@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Board } from '../components/Kanban/Board';
 import { AddLeadModal } from '../components/Kanban/AddLeadModal';
-import { Filter, UserPlus, RefreshCw, Search, Settings } from 'lucide-react'; // Adicionado Settings
-import { PipelineConfigModal } from '../components/Kanban/PipelineConfigModal'; // Adicionado import
+import { Filter, UserPlus, RefreshCw, Search, Settings, LayoutDashboard } from 'lucide-react';
+import { PipelineConfigModal } from '../components/Kanban/PipelineConfigModal';
+import { LeadDetailModal } from '../components/Kanban/LeadDetailModal';
 import { useLeadsStore } from '../store/useLeadsStore';
 
 import { useAuthStore } from '../store/useAuthStore';
@@ -10,8 +11,21 @@ import { useAuthStore } from '../store/useAuthStore';
 export const LeadsPage = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isConfigOpen, setIsConfigOpen] = useState(false);
+    const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const { fetchLeads, leads, isLoading } = useLeadsStore();
+    const {
+        fetchLeads,
+        leads,
+        isLoading,
+        pipelines,
+        currentPipelineId,
+        setCurrentPipeline,
+        fetchPipelines
+    } = useLeadsStore();
+
+    useEffect(() => {
+        fetchPipelines();
+    }, []);
     const { profile } = useAuthStore();
 
     // Only Manager can edit pipeline settings
@@ -27,7 +41,7 @@ export const LeadsPage = () => {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 px-6 md:px-8 pt-6 md:pt-8">
                 <div>
                     <h1 className="text-3xl font-serif font-bold text-gray-900 dark:text-white mb-2">Pipeline de Vendas</h1>
                     <p className="text-gray-500 dark:text-gray-400">
@@ -35,7 +49,22 @@ export const LeadsPage = () => {
                     </p>
                 </div>
 
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 items-center">
+                    {pipelines.length > 1 && (
+                        <div className="relative group">
+                            <select
+                                value={currentPipelineId || ''}
+                                onChange={(e) => setCurrentPipeline(e.target.value)}
+                                className="appearance-none bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg pl-4 pr-10 py-2 text-sm text-gray-800 dark:text-white font-medium focus:outline-none focus:border-charis-gold/50 min-w-[180px] cursor-pointer"
+                            >
+                                {pipelines.map(p => (
+                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                ))}
+                            </select>
+                            <LayoutDashboard className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                        </div>
+                    )}
+
                     {/* Search */}
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={16} />
@@ -83,8 +112,8 @@ export const LeadsPage = () => {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-hidden">
-                <Board />
+            <div className="flex-1 overflow-x-auto overflow-y-hidden px-6 md:px-8 pb-4 custom-scrollbar">
+                <Board onCardClick={(id) => setSelectedLeadId(id)} />
             </div>
 
             {/* Add Lead Modal */}
@@ -96,6 +125,12 @@ export const LeadsPage = () => {
             <PipelineConfigModal
                 isOpen={isConfigOpen}
                 onClose={() => setIsConfigOpen(false)}
+            />
+
+            <LeadDetailModal
+                leadId={selectedLeadId}
+                isOpen={!!selectedLeadId}
+                onClose={() => setSelectedLeadId(null)}
             />
         </div>
     );

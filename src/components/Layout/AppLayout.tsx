@@ -29,7 +29,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
                 </header>
 
                 {/* Main Content Scrollable Area */}
-                <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-8 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-white/10 scrollbar-track-transparent">
+                <main className="flex-1 overflow-y-auto">
                     {children}
                 </main>
             </div>

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, User, Building2, Mail, Phone, DollarSign, Tag, MessageSquare } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, User, Building2, Mail, Phone, DollarSign, Tag, MessageSquare, Calendar } from 'lucide-react';
 import { useLeadsStore } from '../../store/useLeadsStore';
 import type { LeadStatus } from '../../types';
 
@@ -10,20 +10,28 @@ interface AddLeadModalProps {
 }
 
 export const AddLeadModal = ({ isOpen, onClose, defaultStageId }: AddLeadModalProps) => {
-    const { addLead, stages, userId } = useLeadsStore();
+    const { addLead, stages, userId, fieldDefinitions, fetchFieldDefinitions } = useLeadsStore();
 
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
         company: '',
+        birth_date: '',
         value: '',
         source: 'manual',
         notes: '',
         tags: '',
     });
+    const [customFieldValues, setCustomFieldValues] = useState<Record<string, any>>({});
     const [selectedStageId, setSelectedStageId] = useState(defaultStageId || '');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchFieldDefinitions();
+        }
+    }, [isOpen, fetchFieldDefinitions]);
 
     if (!isOpen) return null;
 
@@ -42,6 +50,7 @@ export const AddLeadModal = ({ isOpen, onClose, defaultStageId }: AddLeadModalPr
                 email: formData.email || null,
                 phone: formData.phone || null,
                 company: formData.company || null,
+                birth_date: formData.birth_date || null,
                 value: formData.value ? parseFloat(formData.value) : null,
                 source: formData.source,
                 notes: formData.notes || null,
@@ -56,6 +65,9 @@ export const AddLeadModal = ({ isOpen, onClose, defaultStageId }: AddLeadModalPr
                 utm_term: null,
                 click_id: null,
                 conversion_path: null,
+                custom_fields: customFieldValues,
+                lead_score: 0,
+                loss_reason: null
             });
 
             // Reset form
@@ -64,11 +76,13 @@ export const AddLeadModal = ({ isOpen, onClose, defaultStageId }: AddLeadModalPr
                 email: '',
                 phone: '',
                 company: '',
+                birth_date: '',
                 value: '',
                 source: 'manual',
                 notes: '',
                 tags: '',
             });
+            setCustomFieldValues({});
             onClose();
         } catch (err) {
             console.error('Error adding lead:', err);
@@ -86,9 +100,9 @@ export const AddLeadModal = ({ isOpen, onClose, defaultStageId }: AddLeadModalPr
             />
 
             {/* Modal */}
-            <div className="relative bg-white dark:bg-charis-card border border-gray-200 dark:border-white/10 rounded-2xl w-full max-w-lg mx-4 shadow-2xl">
+            <div className="relative bg-white dark:bg-charis-card border border-gray-200 dark:border-white/10 rounded-2xl w-full max-w-lg mx-4 shadow-2xl max-h-[90vh] flex flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-white/10">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-white/10 flex-shrink-0">
                     <h2 className="text-xl font-serif font-bold text-gray-900 dark:text-white">Novo Lead</h2>
                     <button
                         onClick={onClose}
@@ -99,7 +113,7 @@ export const AddLeadModal = ({ isOpen, onClose, defaultStageId }: AddLeadModalPr
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
                     {/* Name */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -131,6 +145,22 @@ export const AddLeadModal = ({ isOpen, onClose, defaultStageId }: AddLeadModalPr
                                 onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                                 placeholder="Nome da empresa"
                                 className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl pl-10 pr-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-charis-gold/50 transition-all"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Birth Date */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Data de Nascimento
+                        </label>
+                        <div className="relative">
+                            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
+                            <input
+                                type="date"
+                                value={formData.birth_date}
+                                onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
+                                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl pl-10 pr-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-charis-gold/50 transition-all [color-scheme:light] dark:[color-scheme:dark]"
                             />
                         </div>
                     </div>
@@ -240,6 +270,49 @@ export const AddLeadModal = ({ isOpen, onClose, defaultStageId }: AddLeadModalPr
                             />
                         </div>
                     </div>
+
+                    {/* Dynamic Custom Fields */}
+                    {fieldDefinitions.map((field) => (
+                        <div key={field.id}>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {field.label} {field.required && '*'}
+                            </label>
+                            <div className="relative">
+                                {field.type === 'select' ? (
+                                    <select
+                                        value={customFieldValues[field.key] || ''}
+                                        onChange={(e) => setCustomFieldValues({ ...customFieldValues, [field.key]: e.target.value })}
+                                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:border-charis-gold/50 transition-all"
+                                        required={field.required}
+                                    >
+                                        <option value="">Selecione...</option>
+                                        {field.options?.map((opt) => (
+                                            <option key={opt} value={opt}>{opt}</option>
+                                        ))}
+                                    </select>
+                                ) : field.type === 'boolean' ? (
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!customFieldValues[field.key]}
+                                            onChange={(e) => setCustomFieldValues({ ...customFieldValues, [field.key]: e.target.checked })}
+                                            className="w-5 h-5 rounded border-gray-300 text-charis-gold focus:ring-charis-gold"
+                                        />
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">Sim / Marcado</span>
+                                    </div>
+                                ) : (
+                                    <input
+                                        type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'}
+                                        value={customFieldValues[field.key] || ''}
+                                        onChange={(e) => setCustomFieldValues({ ...customFieldValues, [field.key]: e.target.value })}
+                                        placeholder={`Digite ${field.label.toLowerCase()}...`}
+                                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-charis-gold/50 transition-all [color-scheme:light] dark:[color-scheme:dark]"
+                                        required={field.required}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    ))}
 
                     {/* Notes */}
                     <div>
